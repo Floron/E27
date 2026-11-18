@@ -1059,7 +1059,7 @@
                 </div>
             </div>
         </div>`);
-    $('body').append(Lampa.Template.get('online_prestige_css', {}, true));
+    //$('body').append(Lampa.Template.get('online_prestige_css', {}, true));
 
     function initTemplates() {
         Lampa.Template.add('online_prestige_folder', `
