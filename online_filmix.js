@@ -988,7 +988,9 @@ const plugin = {
 // ВАЖНО: используем Manifest.plugins вместо Plugins.add()
 Lampa.Manifest.plugins = plugin;
 
-// Локализация (без ua и zh)
+// ============================================================
+//  ЛОКАЛИЗАЦИЯ (только ru и en)
+// ============================================================
 Lampa.Lang.add({
     online_watch:              { ru: 'Смотреть онлайн', en: 'Watch online' },
     online_video:              { ru: 'Видео',           en: 'Video' },
@@ -1023,7 +1025,55 @@ Lampa.Lang.add({
     filmix_profile_updated:    { ru: 'Профиль Filmix обновлён', en: 'Filmix profile updated' }
 });
 
-// CSS профили
+// ============================================================
+//  РЕГИСТРАЦИЯ ВСЕХ ШАБЛОНОВ (ВАЖНО: до их использования!)
+// ============================================================
+
+// CSS стили для карточек
+Lampa.Template.add('online_prestige_css', `
+    <style>
+    @charset 'UTF-8';
+    .online-prestige{position:relative;border-radius:.3em;background-color:rgba(0,0,0,0.3);display:flex;will-change:transform}
+    .online-prestige__body{padding:1.2em;line-height:1.3;flex-grow:1;position:relative}
+    @media screen and (max-width:480px){.online-prestige__body{padding:.8em 1.2em}}
+    .online-prestige__img{position:relative;width:13em;flex-shrink:0;min-height:8.2em}
+    .online-prestige__img>img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:.3em;opacity:0;transition:opacity .3s}
+    .online-prestige__img--loaded>img{opacity:1}
+    @media screen and (max-width:480px){.online-prestige__img{width:7em;min-height:6em}}
+    .online-prestige__folder{padding:1em;flex-shrink:0}
+    .online-prestige__folder>svg{width:4.4em !important;height:4.4em !important}
+    .online-prestige__viewed{position:absolute;top:1em;left:1em;background:rgba(0,0,0,0.45);border-radius:100%;padding:.25em;font-size:.76em}
+    .online-prestige__viewed>svg{width:1.5em !important;height:1.5em !important}
+    .online-prestige__episode-number{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:2em}
+    .online-prestige__loader{position:absolute;top:50%;left:50%;width:2em;height:2em;margin-left:-1em;margin-top:-1em;background:url(./img/loader.svg) no-repeat center center;background-size:contain}
+    .online-prestige__head,.online-prestige__footer{display:flex;justify-content:space-between;align-items:center}
+    .online-prestige__timeline{margin:.8em 0}
+    .online-prestige__timeline>.time-line{display:block !important}
+    .online-prestige__title{font-size:1.7em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+    @media screen and (max-width:480px){.online-prestige__title{font-size:1.4em}}
+    .online-prestige__time{padding-left:2em}
+    .online-prestige__info{display:flex;align-items:center}
+    .online-prestige__info>*{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical}
+    .online-prestige__quality{padding-left:1em;white-space:nowrap}
+    .online-prestige .online-prestige-split{font-size:.8em;margin:0 1em;flex-shrink:0}
+    .online-prestige.focus::after{content:'';position:absolute;top:-0.6em;left:-0.6em;right:-0.6em;bottom:-0.6em;border-radius:.7em;border:solid .3em #fff;z-index:-1;pointer-events:none}
+    .online-prestige+.online-prestige{margin-top:1.5em}
+    .online-prestige--folder .online-prestige__footer{margin-top:.8em}
+    .online-prestige-rate{display:inline-flex;align-items:center}
+    .online-prestige-rate>svg{width:1.3em !important;height:1.3em !important}
+    .online-prestige-rate>span{font-weight:600;font-size:1.1em;padding-left:.7em}
+    .online-empty{line-height:1.4}
+    .online-empty__title{font-size:2em;margin-bottom:.9em}
+    .online-empty__templates .online-empty-template:nth-child(2){opacity:.5}
+    .online-empty__templates .online-empty-template:nth-child(3){opacity:.2}
+    .online-empty-template{background-color:rgba(255,255,255,0.3);padding:1em;display:flex;align-items:center;border-radius:.3em}
+    .online-empty-template>*{background:rgba(0,0,0,0.3);border-radius:.3em}
+    .online-empty-template__ico{width:4em;height:4em;margin-right:2.4em}
+    .online-empty-template__body{height:1.7em;width:70%}
+    .online-empty-template+.online-empty-template{margin-top:1em}
+    </style>`);
+
+// CSS стили для профиля
 Lampa.Template.add('fxapi_profile_css', `
     <style>
     .fxapi-profile{margin:1em 0;padding:1em;background:rgba(255,255,255,.08);border-radius:.6em;line-height:1.35}
@@ -1037,9 +1087,8 @@ Lampa.Template.add('fxapi_profile_css', `
     .fxapi-profile__meta{opacity:.85;font-size:.92em;margin-top:.45em}
     .fxapi-profile__badge{display:inline-block;margin-bottom:.35em;padding:.15em .55em;border-radius:.3em;background:rgba(255,255,255,.14);font-size:.88em;font-weight:600}
     </style>`);
-$('body').append(Lampa.Template.get('fxapi_profile_css', {}, true));
 
-// Шаблоны
+// Шаблон карточки фильма/сериала
 Lampa.Template.add('online_prestige_full', `
     <div class="online-prestige online-prestige--full selector">
         <div class="online-prestige__img">
@@ -1058,93 +1107,49 @@ Lampa.Template.add('online_prestige_full', `
             </div>
         </div>
     </div>`);
-$('body').append(Lampa.Template.get('online_prestige_css', {}, true));
 
-function initTemplates() {
-    Lampa.Template.add('online_prestige_folder', `
-        <div class="online-prestige online-prestige--folder selector">
-            <div class="online-prestige__folder">
-                <svg viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect y="20" width="128" height="92" rx="13" fill="white"></rect>
-                    <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="white" fill-opacity="0.23"></path>
-                    <rect x="11" y="8" width="106" height="76" rx="13" fill="white" fill-opacity="0.51"></rect>
-                </svg>
-            </div>
-            <div class="online-prestige__body">
-                <div class="online-prestige__head">
-                    <div class="online-prestige__title">{title}</div>
-                    <div class="online-prestige__time">{time}</div>
-                </div>
-                <div class="online-prestige__footer">
-                    <div class="online-prestige__info">{info}</div>
-                </div>
-            </div>
-        </div>`);
-    Lampa.Template.add('online_does_not_answer', `
-        <div class="online-empty">
-            <div class="online-empty__title" style="font-size: 2em; margin-bottom: .9em;">#{online_balanser_dont_work}</div>
-            <div class="online-empty__templates">
-                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-            </div>
-        </div>`);
-    Lampa.Template.add('online_prestige_rate', `
-        <div class="online-prestige-rate">
-            <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="#fff"></path>
+// Шаблон папки (для похожих результатов)
+Lampa.Template.add('online_prestige_folder', `
+    <div class="online-prestige online-prestige--folder selector">
+        <div class="online-prestige__folder">
+            <svg viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect y="20" width="128" height="92" rx="13" fill="white"></rect>
+                <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="white" fill-opacity="0.23"></path>
+                <rect x="11" y="8" width="106" height="76" rx="13" fill="white" fill-opacity="0.51"></rect>
             </svg>
-            <span>{rate}</span>
-        </div>`);
-}
+        </div>
+        <div class="online-prestige__body">
+            <div class="online-prestige__head">
+                <div class="online-prestige__title">{title}</div>
+                <div class="online-prestige__time">{time}</div>
+            </div>
+            <div class="online-prestige__footer">
+                <div class="online-prestige__info">{info}</div>
+            </div>
+        </div>
+    </div>`);
 
-// Кнопка "Смотреть онлайн"
-const buttonHtml = `<div class="full-start__button selector view--online" data-subtitle="Filmix v${plugin.version}">
-    <svg width="135" height="147" viewBox="0 0 135 147" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M121.5 96.8823C139.5 86.49 139.5 60.5092 121.5 50.1169L41.25 3.78454C23.25 -6.60776 0.750004 6.38265 0.750001 27.1673L0.75 51.9742C4.70314 35.7475 23.6209 26.8138 39.0547 35.7701L94.8534 68.1505C110.252 77.0864 111.909 97.8693 99.8725 109.369L121.5 96.8823Z" fill="currentColor"/>
-        <path d="M63 84.9836C80.3333 94.991 80.3333 120.01 63 130.017L39.75 143.44C22.4167 153.448 0.749999 140.938 0.75 120.924L0.750001 94.0769C0.750002 74.0621 22.4167 61.5528 39.75 71.5602L63 84.9836Z" fill="currentColor"/>
-    </svg>
-    <span>#{title_online}</span>
-</div>`;
+// Шаблон ошибки (балансер не отвечает)
+Lampa.Template.add('online_does_not_answer', `
+    <div class="online-empty">
+        <div class="online-empty__title" style="font-size: 2em; margin-bottom: .9em;">#{online_balanser_dont_work}</div>
+        <div class="online-empty__templates">
+            <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+            <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+            <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+        </div>
+    </div>`);
 
-Lampa.Component.add('online_fxapi', FilmixActivity);
-initTemplates();
+// Шаблон рейтинга
+Lampa.Template.add('online_prestige_rate', `
+    <div class="online-prestige-rate">
+        <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="#fff"></path>
+        </svg>
+        <span>{rate}</span>
+    </div>`);
 
-// Кнопка в карточке фильма — через activity listener
-Lampa.Listener.follow('activity', (e) => {
-    if (e.type === 'complite') {
-        const btn = $(Lampa.Lang.translate(buttonHtml));
-        btn.on('hover:enter', () => {
-            initTemplates();
-            Lampa.Component.add('online_fxapi', FilmixActivity);
-            Lampa.Activity.push({
-                url: '', title: Lampa.Lang.translate('title_online'),
-                component: 'online_fxapi',
-                search: e.data.movie.title,
-                search_one: e.data.movie.title,
-                search_two: e.data.movie.original_title,
-                movie: e.data.movie, page: 1
-            });
-        });
-        e.data.activity.render().find('.view--torrent').after(btn);
-    }
-});
-
-// ============================================================
-//  НАСТРОЙКИ
-// ============================================================
-window.fxapi = { max_qualitie: QUALITY.FREE, is_max_qualitie: false };
-
-Lampa.Params.set(STORAGE.TOKEN, '', '');
-Lampa.SettingsApi.addComponent({
-    component: 'fxapi',
-    name: 'Filmix FX',
-    icon: `<svg height="57" viewBox="0 0 58 57" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 20.3735V45H26.8281V34.1262H36.724V26.9806H26.8281V24.3916C26.8281 21.5955 28.9062 19.835 31.1823 19.835H39V13H26.8281C23.6615 13 20 15.4854 20 20.3735Z" fill="white"/>
-        <rect x="2" y="2" width="54" height="53" rx="5" stroke="white" stroke-width="4"/>
-    </svg>`
-});
-
+// Шаблон настроек плагина
 Lampa.Template.add('settings_fxapi', `
     <div>
         <div class="settings-param" data-name="fxapi_profile" data-static="true"></div>
@@ -1161,14 +1166,83 @@ Lampa.Template.add('settings_fxapi', `
         </div>
     </div>`);
 
+// ============================================================
+//  ДОБАВЛЕНИЕ CSS В DOM (теперь шаблоны уже зарегистрированы)
+// ============================================================
+$('body').append(Lampa.Template.get('online_prestige_css', {}, true));
+$('body').append(Lampa.Template.get('fxapi_profile_css', {}, true));
+
+// ============================================================
+//  ОСТАЛЬНОЙ КОД ПЛАГИНА (без изменений)
+// ============================================================
+const plugin = {
+    type: 'video',
+    version: '1.0.7',
+    name: 'Онлайн - Filmix',
+    description: 'Плагин для просмотра онлайн сериалов и фильмов',
+    component: 'online_fxapi',
+    onContextMenu: () => ({ name: Lampa.Lang.translate('online_watch'), description: '' }),
+    onContextLauch: (card) => {
+        Lampa.Component.add('online_fxapi', FilmixActivity);
+        Lampa.Activity.push({
+            url: '', title: Lampa.Lang.translate('title_online'),
+            component: 'online_fxapi',
+            search: card.title, search_one: card.title, search_two: card.original_title,
+            movie: card, page: 1
+        });
+    }
+};
+
+Lampa.Manifest.plugins = plugin;
+Lampa.Component.add('online_fxapi', FilmixActivity);
+
+// Кнопка в карточке фильма
+Lampa.Listener.follow('activity', (e) => {
+    if (e.type === 'complite') {
+        const btn = $(`<div class="full-start__button selector view--online" data-subtitle="Filmix v${plugin.version}">
+            <svg width="135" height="147" viewBox="0 0 135 147" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M121.5 96.8823C139.5 86.49 139.5 60.5092 121.5 50.1169L41.25 3.78454C23.25 -6.60776 0.750004 6.38265 0.750001 27.1673L0.75 51.9742C4.70314 35.7475 23.6209 26.8138 39.0547 35.7701L94.8534 68.1505C110.252 77.0864 111.909 97.8693 99.8725 109.369L121.5 96.8823Z" fill="currentColor"/>
+                <path d="M63 84.9836C80.3333 94.991 80.3333 120.01 63 130.017L39.75 143.44C22.4167 153.448 0.749999 140.938 0.75 120.924L0.750001 94.0769C0.750002 74.0621 22.4167 61.5528 39.75 71.5602L63 84.9836Z" fill="currentColor"/>
+            </svg>
+            <span>#{title_online}</span>
+        </div>`);
+        btn.on('hover:enter', () => {
+            Lampa.Activity.push({
+                url: '', title: Lampa.Lang.translate('title_online'),
+                component: 'online_fxapi',
+                search: e.data.movie.title,
+                search_one: e.data.movie.title,
+                search_two: e.data.movie.original_title,
+                movie: e.data.movie, page: 1
+            });
+        });
+        e.data.activity.render().find('.view--torrent').after(btn);
+    }
+});
+
+// ============================================================
+//  НАСТРОЙКИ
+// ============================================================
+window.fxapi = { max_qualitie: 720, is_max_qualitie: false };
+
+Lampa.Params.set('fxapi_token', '', '');
+Lampa.SettingsApi.addComponent({
+    component: 'fxapi',
+    name: 'Filmix FX',
+    icon: `<svg height="57" viewBox="0 0 58 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 20.3735V45H26.8281V34.1262H36.724V26.9806H26.8281V24.3916C26.8281 21.5955 28.9062 19.835 31.1823 19.835H39V13H26.8281C23.6615 13 20 15.4854 20 20.3735Z" fill="white"/>
+        <rect x="2" y="2" width="54" height="53" rx="5" stroke="white" stroke-width="4"/>
+    </svg>`
+});
+
 // Обработчики настроек
 Lampa.Storage.listener.follow('change', (e) => {
-    if (e.name === STORAGE.TOKEN) {
+    if (e.name === 'fxapi_token') {
         window.fxapi.is_max_qualitie = true;
         if (e.value) fetchProfile(e.value);
         else {
-            Lampa.Storage.set(STORAGE.STATUS, {});
-            window.fxapi.max_qualitie = QUALITY.FREE;
+            Lampa.Storage.set('fxapi_status', {});
+            window.fxapi.max_qualitie = 720;
             renderProfile();
         }
     }
@@ -1205,7 +1279,7 @@ Lampa.SettingsApi.listener.follow('open', (e) => {
                 if (res && res.user_data) {
                     Lampa.Modal.close();
                     clearInterval(this._deviceTimer);
-                    Lampa.Storage.set(STORAGE.TOKEN, token);
+                    Lampa.Storage.set('fxapi_token', token);
                     e.body.find('[data-name="fxapi_token"]').append(token);
                     fetchProfile(token);
                     Lampa.Controller.toggle('settings_component');
@@ -1229,7 +1303,7 @@ const savedToken = getToken();
 if (savedToken) fetchProfile(savedToken);
 
 // Синхронизация
-if (Lampa.Manifest.app_digital >= 177) Lampa.Storage.sync(STORAGE.CHOICE, 'object_object');
+if (Lampa.Manifest.app_digital >= 177) Lampa.Storage.sync('online_choice_fxapi', 'object_object');
 
 console.log('[Filmix] Плагин инициализирован (v' + plugin.version + ')');
 })();
