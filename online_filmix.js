@@ -7,8 +7,6 @@
 (function () {
     'use strict';
 
-    // Проверка минимальной версии Lampa
-    if (window.online_filmix || Lampa.Manifest.app_digital < 155) return;
     window.online_filmix = true;
 
     // ============================================================
