@@ -963,276 +963,273 @@
             clearInterval(this._deviceTimer);
         }
     }
-
     // ============================================================
-    //  РЕГИСТРАЦИЯ ПЛАГИНА
-    // ============================================================
-    const plugin = {
-        type: 'video',
-        version: '1.0.7',
-        name: 'Онлайн - Filmix',
-        description: 'Плагин для просмотра онлайн сериалов и фильмов',
-        component: 'online_fxapi',
-        onContextMenu: () => ({ name: Lampa.Lang.translate('online_watch'), description: '' }),
-        onContextLauch: (card) => {
-            initTemplates();
-            Lampa.Component.add('online_fxapi', FilmixActivity);
-            Lampa.Activity.push({
-                url: '', title: Lampa.Lang.translate('title_online'),
-                component: 'online_fxapi',
-                search: card.title, search_one: card.title, search_two: card.original_title,
-                movie: card, page: 1
-            });
-        }
-    };
-    Lampa.Plugins.add('online_filmix', plugin);
+//  РЕГИСТРАЦИЯ ПЛАГИНА (ИСПРАВЛЕННАЯ)
+// ============================================================
+const plugin = {
+    type: 'video',
+    version: '1.0.7',
+    name: 'Онлайн - Filmix',
+    description: 'Плагин для просмотра онлайн сериалов и фильмов',
+    component: 'online_fxapi',
+    onContextMenu: () => ({ name: Lampa.Lang.translate('online_watch'), description: '' }),
+    onContextLauch: (card) => {
+        initTemplates();
+        Lampa.Component.add('online_fxapi', FilmixActivity);
+        Lampa.Activity.push({
+            url: '', title: Lampa.Lang.translate('title_online'),
+            component: 'online_fxapi',
+            search: card.title, search_one: card.title, search_two: card.original_title,
+            movie: card, page: 1
+        });
+    }
+};
 
-    // ============================================================
-    //  ЛОКАЛИЗАЦИЯ (только ru и en)
-    // ============================================================
-    Lampa.Lang.add({
-        online_watch:              { ru: 'Смотреть онлайн', en: 'Watch online' },
-        online_video:              { ru: 'Видео',           en: 'Video' },
-        online_nolink:             { ru: 'Не удалось извлечь ссылку', en: 'Failed to fetch link' },
-        helper_online_file:        { ru: 'Удерживайте клавишу "ОК" для вызова контекстного меню', en: 'Hold the "OK" key to bring up the context menu' },
-        title_online:              { ru: 'Онлайн',          en: 'Online' },
-        modal_text:                { ru: 'Введите код на странице https://filmix.my/consoles', en: 'Enter the code on the page https://filmix.my/consoles' },
-        modal_wait:                { ru: 'Ожидаем код',     en: 'Waiting for the code' },
-        copy_secuses:              { ru: 'Код скопирован в буфер обмена', en: 'Code copied to clipboard' },
-        copy_fail:                 { ru: 'Ошибка при копировании', en: 'Copy error' },
-        title_status:              { ru: 'Статус',          en: 'Status' },
-        online_voice_subscribe:    { ru: 'Подписаться на перевод', en: 'Subscribe to translation' },
-        online_voice_success:      { ru: 'Вы успешно подписались', en: 'You have successfully subscribed' },
-        online_voice_error:        { ru: 'Возникла ошибка', en: 'An error has occurred' },
-        online_clear_all_marks:    { ru: 'Очистить все метки', en: 'Clear all labels' },
-        online_clear_all_timecodes:{ ru: 'Очистить все тайм-коды', en: 'Clear all timecodes' },
-        online_balanser_dont_work: { ru: 'Балансер не отвечает на запрос.', en: 'The balancer did not respond to the request.' },
-        online_nostreams:          { ru: 'Контент найден, но ссылки на видео недоступны. Проверьте авторизацию Filmix.', en: 'Content found, but video links are unavailable. Check Filmix authorization.' },
-        fxapi_proxy_title:         { ru: 'CORS прокси Filmix', en: 'Filmix CORS proxy' },
-        fxapi_proxy_descr:         { ru: 'Прокси должен подменять User-Agent для filmixapp', en: 'Proxy must override User-Agent for filmixapp' },
-        filmix_param_add_title:    { ru: 'Добавить ТОКЕН от Filmix', en: 'Add TOKEN from Filmix' },
-        filmix_param_add_descr:    { ru: 'Добавьте ТОКЕН для подключения подписки', en: 'Add a TOKEN to connect a subscription' },
-        filmix_param_placeholder:  { ru: 'Например: nxjekeb57385b..', en: 'For example: nxjekeb57385b..' },
-        filmix_param_add_device:   { ru: 'Добавить устройство на Filmix', en: 'Add Device to Filmix' },
-        filmix_nodevice:           { ru: 'Устройство не авторизовано', en: 'Device not authorized' },
-        filmix_sub_free:           { ru: 'Бесплатно',       en: 'Free' },
-        filmix_sub_days:           { ru: 'Осталось дней',   en: 'Days left' },
-        filmix_max_quality:        { ru: 'Макс. качество',  en: 'Max quality' },
-        filmix_video_server:       { ru: 'Видео сервер',    en: 'Video server' },
-        fxapi_refresh_profile:     { ru: 'Обновить профиль Filmix', en: 'Refresh Filmix profile' },
-        filmix_pro_until:          { ru: 'Подписка до',     en: 'Subscription until' },
-        filmix_profile_updated:    { ru: 'Профиль Filmix обновлён', en: 'Filmix profile updated' }
-    });
+// ВАЖНО: используем Manifest.plugins вместо Plugins.add()
+Lampa.Manifest.plugins = plugin;
 
-    // CSS профили
-    Lampa.Template.add('fxapi_profile_css', `
-        <style>
-        .fxapi-profile{margin:1em 0;padding:1em;background:rgba(255,255,255,.08);border-radius:.6em;line-height:1.35}
-        .fxapi-profile--empty{opacity:.75;padding:1.2em 1em}
-        .fxapi-profile__wrap{display:flex;gap:1em;align-items:center}
-        .fxapi-profile__avatar{width:4.5em;height:4.5em;border-radius:50%;overflow:hidden;background:rgba(0,0,0,.35);flex-shrink:0;display:flex;align-items:center;justify-content:center}
-        .fxapi-profile__avatar img{width:100%;height:100%;object-fit:cover}
-        .fxapi-profile__placeholder{font-size:1.8em;font-weight:600;text-transform:uppercase}
-        .fxapi-profile__title{font-size:1.25em;font-weight:600}
-        .fxapi-profile__login{opacity:.75;font-size:.95em;margin-top:.15em}
-        .fxapi-profile__meta{opacity:.85;font-size:.92em;margin-top:.45em}
-        .fxapi-profile__badge{display:inline-block;margin-bottom:.35em;padding:.15em .55em;border-radius:.3em;background:rgba(255,255,255,.14);font-size:.88em;font-weight:600}
-        </style>`);
-    $('body').append(Lampa.Template.get('fxapi_profile_css', {}, true));
+// Локализация (без ua и zh)
+Lampa.Lang.add({
+    online_watch:              { ru: 'Смотреть онлайн', en: 'Watch online' },
+    online_video:              { ru: 'Видео',           en: 'Video' },
+    online_nolink:             { ru: 'Не удалось извлечь ссылку', en: 'Failed to fetch link' },
+    helper_online_file:        { ru: 'Удерживайте клавишу "ОК" для вызова контекстного меню', en: 'Hold the "OK" key to bring up the context menu' },
+    title_online:              { ru: 'Онлайн',          en: 'Online' },
+    modal_text:                { ru: 'Введите код на странице https://filmix.my/consoles', en: 'Enter the code on the page https://filmix.my/consoles' },
+    modal_wait:                { ru: 'Ожидаем код',     en: 'Waiting for the code' },
+    copy_secuses:              { ru: 'Код скопирован в буфер обмена', en: 'Code copied to clipboard' },
+    copy_fail:                 { ru: 'Ошибка при копировании', en: 'Copy error' },
+    title_status:              { ru: 'Статус',          en: 'Status' },
+    online_voice_subscribe:    { ru: 'Подписаться на перевод', en: 'Subscribe to translation' },
+    online_voice_success:      { ru: 'Вы успешно подписались', en: 'You have successfully subscribed' },
+    online_voice_error:        { ru: 'Возникла ошибка', en: 'An error has occurred' },
+    online_clear_all_marks:    { ru: 'Очистить все метки', en: 'Clear all labels' },
+    online_clear_all_timecodes:{ ru: 'Очистить все тайм-коды', en: 'Clear all timecodes' },
+    online_balanser_dont_work: { ru: 'Балансер не отвечает на запрос.', en: 'The balancer did not respond to the request.' },
+    online_nostreams:          { ru: 'Контент найден, но ссылки на видео недоступны. Проверьте авторизацию Filmix.', en: 'Content found, but video links are unavailable. Check Filmix authorization.' },
+    fxapi_proxy_title:         { ru: 'CORS прокси Filmix', en: 'Filmix CORS proxy' },
+    fxapi_proxy_descr:         { ru: 'Прокси должен подменять User-Agent для filmixapp', en: 'Proxy must override User-Agent for filmixapp' },
+    filmix_param_add_title:    { ru: 'Добавить ТОКЕН от Filmix', en: 'Add TOKEN from Filmix' },
+    filmix_param_add_descr:    { ru: 'Добавьте ТОКЕН для подключения подписки', en: 'Add a TOKEN to connect a subscription' },
+    filmix_param_placeholder:  { ru: 'Например: nxjekeb57385b..', en: 'For example: nxjekeb57385b..' },
+    filmix_param_add_device:   { ru: 'Добавить устройство на Filmix', en: 'Add Device to Filmix' },
+    filmix_nodevice:           { ru: 'Устройство не авторизовано', en: 'Device not authorized' },
+    filmix_sub_free:           { ru: 'Бесплатно',       en: 'Free' },
+    filmix_sub_days:           { ru: 'Осталось дней',   en: 'Days left' },
+    filmix_max_quality:        { ru: 'Макс. качество',  en: 'Max quality' },
+    filmix_video_server:       { ru: 'Видео сервер',    en: 'Video server' },
+    fxapi_refresh_profile:     { ru: 'Обновить профиль Filmix', en: 'Refresh Filmix profile' },
+    filmix_pro_until:          { ru: 'Подписка до',     en: 'Subscription until' },
+    filmix_profile_updated:    { ru: 'Профиль Filmix обновлён', en: 'Filmix profile updated' }
+});
 
-    // Шаблоны
-    Lampa.Template.add('online_prestige_full', `
-        <div class="online-prestige online-prestige--full selector">
-            <div class="online-prestige__img">
-                <img alt="">
-                <div class="online-prestige__loader"></div>
+// CSS профили
+Lampa.Template.add('fxapi_profile_css', `
+    <style>
+    .fxapi-profile{margin:1em 0;padding:1em;background:rgba(255,255,255,.08);border-radius:.6em;line-height:1.35}
+    .fxapi-profile--empty{opacity:.75;padding:1.2em 1em}
+    .fxapi-profile__wrap{display:flex;gap:1em;align-items:center}
+    .fxapi-profile__avatar{width:4.5em;height:4.5em;border-radius:50%;overflow:hidden;background:rgba(0,0,0,.35);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .fxapi-profile__avatar img{width:100%;height:100%;object-fit:cover}
+    .fxapi-profile__placeholder{font-size:1.8em;font-weight:600;text-transform:uppercase}
+    .fxapi-profile__title{font-size:1.25em;font-weight:600}
+    .fxapi-profile__login{opacity:.75;font-size:.95em;margin-top:.15em}
+    .fxapi-profile__meta{opacity:.85;font-size:.92em;margin-top:.45em}
+    .fxapi-profile__badge{display:inline-block;margin-bottom:.35em;padding:.15em .55em;border-radius:.3em;background:rgba(255,255,255,.14);font-size:.88em;font-weight:600}
+    </style>`);
+$('body').append(Lampa.Template.get('fxapi_profile_css', {}, true));
+
+// Шаблоны
+Lampa.Template.add('online_prestige_full', `
+    <div class="online-prestige online-prestige--full selector">
+        <div class="online-prestige__img">
+            <img alt="">
+            <div class="online-prestige__loader"></div>
+        </div>
+        <div class="online-prestige__body">
+            <div class="online-prestige__head">
+                <div class="online-prestige__title">{title}</div>
+                <div class="online-prestige__time">{time}</div>
+            </div>
+            <div class="online-prestige__timeline"></div>
+            <div class="online-prestige__footer">
+                <div class="online-prestige__info">{info}</div>
+                <div class="online-prestige__quality">{quality}</div>
+            </div>
+        </div>
+    </div>`);
+$('body').append(Lampa.Template.get('online_prestige_css', {}, true));
+
+function initTemplates() {
+    Lampa.Template.add('online_prestige_folder', `
+        <div class="online-prestige online-prestige--folder selector">
+            <div class="online-prestige__folder">
+                <svg viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect y="20" width="128" height="92" rx="13" fill="white"></rect>
+                    <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="white" fill-opacity="0.23"></path>
+                    <rect x="11" y="8" width="106" height="76" rx="13" fill="white" fill-opacity="0.51"></rect>
+                </svg>
             </div>
             <div class="online-prestige__body">
                 <div class="online-prestige__head">
                     <div class="online-prestige__title">{title}</div>
                     <div class="online-prestige__time">{time}</div>
                 </div>
-                <div class="online-prestige__timeline"></div>
                 <div class="online-prestige__footer">
                     <div class="online-prestige__info">{info}</div>
-                    <div class="online-prestige__quality">{quality}</div>
                 </div>
             </div>
         </div>`);
-    //$('body').append(Lampa.Template.get('online_prestige_css', {}, true));
+    Lampa.Template.add('online_does_not_answer', `
+        <div class="online-empty">
+            <div class="online-empty__title" style="font-size: 2em; margin-bottom: .9em;">#{online_balanser_dont_work}</div>
+            <div class="online-empty__templates">
+                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+                <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
+            </div>
+        </div>`);
+    Lampa.Template.add('online_prestige_rate', `
+        <div class="online-prestige-rate">
+            <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="#fff"></path>
+            </svg>
+            <span>{rate}</span>
+        </div>`);
+}
 
-    function initTemplates() {
-        Lampa.Template.add('online_prestige_folder', `
-            <div class="online-prestige online-prestige--folder selector">
-                <div class="online-prestige__folder">
-                    <svg viewBox="0 0 128 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <rect y="20" width="128" height="92" rx="13" fill="white"></rect>
-                        <path d="M29.9963 8H98.0037C96.0446 3.3021 91.4079 0 86 0H42C36.5921 0 31.9555 3.3021 29.9963 8Z" fill="white" fill-opacity="0.23"></path>
-                        <rect x="11" y="8" width="106" height="76" rx="13" fill="white" fill-opacity="0.51"></rect>
-                    </svg>
-                </div>
-                <div class="online-prestige__body">
-                    <div class="online-prestige__head">
-                        <div class="online-prestige__title">{title}</div>
-                        <div class="online-prestige__time">{time}</div>
-                    </div>
-                    <div class="online-prestige__footer">
-                        <div class="online-prestige__info">{info}</div>
-                    </div>
-                </div>
-            </div>`);
-        Lampa.Template.add('online_does_not_answer', `
-            <div class="online-empty">
-                <div class="online-empty__title" style="font-size: 2em; margin-bottom: .9em;">#{online_balanser_dont_work}</div>
-                <div class="online-empty__templates">
-                    <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                    <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                    <div class="online-empty-template"><div class="online-empty-template__ico"></div><div class="online-empty-template__body"></div></div>
-                </div>
-            </div>`);
-        Lampa.Template.add('online_prestige_rate', `
-            <div class="online-prestige-rate">
-                <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M8.39409 0.192139L10.99 5.30994L16.7882 6.20387L12.5475 10.4277L13.5819 15.9311L8.39409 13.2425L3.20626 15.9311L4.24065 10.4277L0 6.20387L5.79819 5.30994L8.39409 0.192139Z" fill="#fff"></path>
-                </svg>
-                <span>{rate}</span>
-            </div>`);
-    }
+// Кнопка "Смотреть онлайн"
+const buttonHtml = `<div class="full-start__button selector view--online" data-subtitle="Filmix v${plugin.version}">
+    <svg width="135" height="147" viewBox="0 0 135 147" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M121.5 96.8823C139.5 86.49 139.5 60.5092 121.5 50.1169L41.25 3.78454C23.25 -6.60776 0.750004 6.38265 0.750001 27.1673L0.75 51.9742C4.70314 35.7475 23.6209 26.8138 39.0547 35.7701L94.8534 68.1505C110.252 77.0864 111.909 97.8693 99.8725 109.369L121.5 96.8823Z" fill="currentColor"/>
+        <path d="M63 84.9836C80.3333 94.991 80.3333 120.01 63 130.017L39.75 143.44C22.4167 153.448 0.749999 140.938 0.75 120.924L0.750001 94.0769C0.750002 74.0621 22.4167 61.5528 39.75 71.5602L63 84.9836Z" fill="currentColor"/>
+    </svg>
+    <span>#{title_online}</span>
+</div>`;
 
-    // Кнопка "Смотреть онлайн"
-    const buttonHtml = `<div class="full-start__button selector view--online" data-subtitle="Filmix v${plugin.version}">
-        <svg width="135" height="147" viewBox="0 0 135 147" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M121.5 96.8823C139.5 86.49 139.5 60.5092 121.5 50.1169L41.25 3.78454C23.25 -6.60776 0.750004 6.38265 0.750001 27.1673L0.75 51.9742C4.70314 35.7475 23.6209 26.8138 39.0547 35.7701L94.8534 68.1505C110.252 77.0864 111.909 97.8693 99.8725 109.369L121.5 96.8823Z" fill="currentColor"/>
-            <path d="M63 84.9836C80.3333 94.991 80.3333 120.01 63 130.017L39.75 143.44C22.4167 153.448 0.749999 140.938 0.75 120.924L0.750001 94.0769C0.750002 74.0621 22.4167 61.5528 39.75 71.5602L63 84.9836Z" fill="currentColor"/>
-        </svg>
-        <span>#{title_online}</span>
-    </div>`;
+Lampa.Component.add('online_fxapi', FilmixActivity);
+initTemplates();
 
-    Lampa.Component.add('online_fxapi', FilmixActivity);
-    initTemplates();
-
-    // Кнопка в карточке фильма
-    Lampa.Listener.follow('settings', (e) => {
-        if (e.type === 'complite') {
-            const btn = $(Lampa.Lang.translate(buttonHtml));
-            btn.on('hover:enter', () => {
-                initTemplates();
-                Lampa.Component.add('online_fxapi', FilmixActivity);
-                Lampa.Activity.push({
-                    url: '', title: Lampa.Lang.translate('title_online'),
-                    component: 'online_fxapi',
-                    search: e.data.movie.title,
-                    search_one: e.data.movie.title,
-                    search_two: e.data.movie.original_title,
-                    movie: e.data.movie, page: 1
-                });
+// Кнопка в карточке фильма — через activity listener
+Lampa.Listener.follow('activity', (e) => {
+    if (e.type === 'complite') {
+        const btn = $(Lampa.Lang.translate(buttonHtml));
+        btn.on('hover:enter', () => {
+            initTemplates();
+            Lampa.Component.add('online_fxapi', FilmixActivity);
+            Lampa.Activity.push({
+                url: '', title: Lampa.Lang.translate('title_online'),
+                component: 'online_fxapi',
+                search: e.data.movie.title,
+                search_one: e.data.movie.title,
+                search_two: e.data.movie.original_title,
+                movie: e.data.movie, page: 1
             });
-            e.data.activity.render().find('.view--torrent').after(btn);
-        }
-    });
-
-    // ============================================================
-    //  НАСТРОЙКИ
-    // ============================================================
-    window.fxapi = { max_qualitie: QUALITY.FREE, is_max_qualitie: false };
-
-    Lampa.Params.set(STORAGE.TOKEN, '', '');
-    Lampa.SettingsApi.addComponent({
-        component: 'fxapi',
-        name: 'Filmix FX',
-        icon: `<svg height="57" viewBox="0 0 58 57" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 20.3735V45H26.8281V34.1262H36.724V26.9806H26.8281V24.3916C26.8281 21.5955 28.9062 19.835 31.1823 19.835H39V13H26.8281C23.6615 13 20 15.4854 20 20.3735Z" fill="white"/>
-            <rect x="2" y="2" width="54" height="53" rx="5" stroke="white" stroke-width="4"/>
-        </svg>`
-    });
-
-    Lampa.Template.add('settings_fxapi', `
-        <div>
-            <div class="settings-param" data-name="fxapi_profile" data-static="true"></div>
-            <div class="settings-param selector" data-name="fxapi_refresh" data-static="true">
-                <div class="settings-param__name">#{fxapi_refresh_profile}</div>
-            </div>
-            <div class="settings-param selector" data-name="fxapi_token" data-type="input" placeholder="#{filmix_param_placeholder}">
-                <div class="settings-param__name">#{filmix_param_add_title}</div>
-                <div class="settings-param__value"></div>
-                <div class="settings-param__descr">#{filmix_param_add_descr}</div>
-            </div>
-            <div class="settings-param selector" data-name="fxapi_add" data-static="true">
-                <div class="settings-param__name">#{filmix_param_add_device}</div>
-            </div>
-        </div>`);
-
-    // Обработчики настроек
-    Lampa.Storage.listener.follow('change', (e) => {
-        if (e.name === STORAGE.TOKEN) {
-            window.fxapi.is_max_qualitie = true;
-            if (e.value) fetchProfile(e.value);
-            else {
-                Lampa.Storage.set(STORAGE.STATUS, {});
-                window.fxapi.max_qualitie = QUALITY.FREE;
-                renderProfile();
-            }
-        }
-    });
-
-    Lampa.SettingsApi.listener.follow('open', (e) => {
-        if (e.name !== 'fxapi') return;
-        renderProfile();
-        const token = getToken();
-        if (token) fetchProfile(token);
-
-        // Кнопка "Обновить профиль"
-        e.body.find('[data-name="fxapi_refresh"]').toggleClass('selector').on('hover:enter', () => {
-            const t = getToken();
-            if (!t) { Lampa.Noty.show(Lampa.Lang.translate('filmix_nodevice')); return; }
-            fetchProfile(t, (u) => { if (u) Lampa.Noty.show(Lampa.Lang.translate('filmix_profile_updated')); });
         });
+        e.data.activity.render().find('.view--torrent').after(btn);
+    }
+});
 
-        // Кнопка "Добавить устройство"
-        e.body.find('[data-name="fxapi_add"]').toggleClass('selector').on('hover:enter', () => {
-            const req = new Lampa.Reguest();
-            let userCode = '', token = '';
-            const modal = $(`<div><div class="broadcast__text">${Lampa.Lang.translate('modal_text')}</div>
-                <div class="broadcast__device selector" style="text-align: center">${Lampa.Lang.translate('modal_wait')}</div></div>`);
-            Lampa.Modal.open({
-                title: '', html: modal,
-                onBack: () => { Lampa.Modal.close(); Lampa.Controller.toggle('settings_component'); clearInterval(this._deviceTimer); },
-                onSelect: () => {
-                    Lampa.Utils.copyTextToClipboard(userCode,
-                        () => Lampa.Noty.show(Lampa.Lang.translate('copy_secuses')),
-                        () => Lampa.Noty.show(Lampa.Lang.translate('copy_fail')));
+// ============================================================
+//  НАСТРОЙКИ
+// ============================================================
+window.fxapi = { max_qualitie: QUALITY.FREE, is_max_qualitie: false };
+
+Lampa.Params.set(STORAGE.TOKEN, '', '');
+Lampa.SettingsApi.addComponent({
+    component: 'fxapi',
+    name: 'Filmix FX',
+    icon: `<svg height="57" viewBox="0 0 58 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 20.3735V45H26.8281V34.1262H36.724V26.9806H26.8281V24.3916C26.8281 21.5955 28.9062 19.835 31.1823 19.835H39V13H26.8281C23.6615 13 20 15.4854 20 20.3735Z" fill="white"/>
+        <rect x="2" y="2" width="54" height="53" rx="5" stroke="white" stroke-width="4"/>
+    </svg>`
+});
+
+Lampa.Template.add('settings_fxapi', `
+    <div>
+        <div class="settings-param" data-name="fxapi_profile" data-static="true"></div>
+        <div class="settings-param selector" data-name="fxapi_refresh" data-static="true">
+            <div class="settings-param__name">#{fxapi_refresh_profile}</div>
+        </div>
+        <div class="settings-param selector" data-name="fxapi_token" data-type="input" placeholder="#{filmix_param_placeholder}">
+            <div class="settings-param__name">#{filmix_param_add_title}</div>
+            <div class="settings-param__value"></div>
+            <div class="settings-param__descr">#{filmix_param_add_descr}</div>
+        </div>
+        <div class="settings-param selector" data-name="fxapi_add" data-static="true">
+            <div class="settings-param__name">#{filmix_param_add_device}</div>
+        </div>
+    </div>`);
+
+// Обработчики настроек
+Lampa.Storage.listener.follow('change', (e) => {
+    if (e.name === STORAGE.TOKEN) {
+        window.fxapi.is_max_qualitie = true;
+        if (e.value) fetchProfile(e.value);
+        else {
+            Lampa.Storage.set(STORAGE.STATUS, {});
+            window.fxapi.max_qualitie = QUALITY.FREE;
+            renderProfile();
+        }
+    }
+});
+
+Lampa.SettingsApi.listener.follow('open', (e) => {
+    if (e.name !== 'fxapi') return;
+    renderProfile();
+    const token = getToken();
+    if (token) fetchProfile(token);
+
+    e.body.find('[data-name="fxapi_refresh"]').toggleClass('selector').on('hover:enter', () => {
+        const t = getToken();
+        if (!t) { Lampa.Noty.show(Lampa.Lang.translate('filmix_nodevice')); return; }
+        fetchProfile(t, (u) => { if (u) Lampa.Noty.show(Lampa.Lang.translate('filmix_profile_updated')); });
+    });
+
+    e.body.find('[data-name="fxapi_add"]').toggleClass('selector').on('hover:enter', () => {
+        const req = new Lampa.Reguest();
+        let userCode = '', token = '';
+        const modal = $(`<div><div class="broadcast__text">${Lampa.Lang.translate('modal_text')}</div>
+            <div class="broadcast__device selector" style="text-align: center">${Lampa.Lang.translate('modal_wait')}</div></div>`);
+        Lampa.Modal.open({
+            title: '', html: modal,
+            onBack: () => { Lampa.Modal.close(); Lampa.Controller.toggle('settings_component'); clearInterval(this._deviceTimer); },
+            onSelect: () => {
+                Lampa.Utils.copyTextToClipboard(userCode,
+                    () => Lampa.Noty.show(Lampa.Lang.translate('copy_secuses')),
+                    () => Lampa.Noty.show(Lampa.Lang.translate('copy_fail')));
+            }
+        });
+        this._deviceTimer = setInterval(() => {
+            req.silent(buildUrl('user_profile', token), (res) => {
+                if (res && res.user_data) {
+                    Lampa.Modal.close();
+                    clearInterval(this._deviceTimer);
+                    Lampa.Storage.set(STORAGE.TOKEN, token);
+                    e.body.find('[data-name="fxapi_token"]').append(token);
+                    fetchProfile(token);
+                    Lampa.Controller.toggle('settings_component');
                 }
             });
-            this._deviceTimer = setInterval(() => {
-                req.silent(buildUrl('user_profile', token), (res) => {
-                    if (res && res.user_data) {
-                        Lampa.Modal.close();
-                        clearInterval(this._deviceTimer);
-                        Lampa.Storage.set(STORAGE.TOKEN, token);
-                        e.body.find('[data-name="fxapi_token"]').append(token);
-                        fetchProfile(token);
-                        Lampa.Controller.toggle('settings_component');
-                    }
-                });
-            }, 2000);
-            req.reset();
-            req.timeout(10000);
-            req.silent(buildUrl('token_request', ''), (res) => {
-                if (res.status === 'ok') {
-                    token    = res.token;
-                    userCode = res.user_code;
-                    modal.find('.broadcast__device').append(userCode);
-                } else Lampa.Noty.show(res);
-            }, (e, t) => Lampa.Noty.show(req.error(e, t)));
-        });
+        }, 2000);
+        req.reset();
+        req.timeout(10000);
+        req.silent(buildUrl('token_request', ''), (res) => {
+            if (res.status === 'ok') {
+                token    = res.token;
+                userCode = res.user_code;
+                modal.find('.broadcast__device').append(userCode);
+            } else Lampa.Noty.show(res);
+        }, (e, t) => Lampa.Noty.show(req.error(e, t)));
     });
+});
 
-    // Автовход
-    const savedToken = getToken();
-    if (savedToken) fetchProfile(savedToken);
+// Автовход
+const savedToken = getToken();
+if (savedToken) fetchProfile(savedToken);
 
-    // Синхронизация
-    if (Lampa.Manifest.app_digital >= 177) Lampa.Storage.sync(STORAGE.CHOICE, 'object_object');
+// Синхронизация
+if (Lampa.Manifest.app_digital >= 177) Lampa.Storage.sync(STORAGE.CHOICE, 'object_object');
 
-    console.log('[Filmix] Плагин инициализирован (v' + plugin.version + ')');
+console.log('[Filmix] Плагин инициализирован (v' + plugin.version + ')');
 })();
